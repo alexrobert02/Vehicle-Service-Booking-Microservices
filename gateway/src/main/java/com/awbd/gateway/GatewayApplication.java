@@ -33,6 +33,20 @@ public class GatewayApplication {
                                 })
                         )
                         .uri("lb://FIRST-SERVICE"))
+                .route("vehicle_route", r -> r
+                        .path("/awbd/vehicle/**")
+                        .filters(f -> f.rewritePath("/awbd/vehicle/(?<segment>.*)", "/${segment}")
+                                .filter((exchange, chain) -> {
+                                    long start = System.currentTimeMillis();
+                                    return chain.filter(exchange).then(
+                                            Mono.fromRunnable(() -> {
+                                                long duration = System.currentTimeMillis() - start;
+                                                exchange.getResponse().getHeaders().add("X-Response-Time", duration + "ms");
+                                            })
+                                    );
+                                })
+                        )
+                        .uri("lb://VEHICLE"))
                 .route("discount_route", r -> r
                         .path("/awbd/discount/**")
                         .filters(f -> f.rewritePath("/awbd/discount/(?<segment>.*)", "/${segment}")
