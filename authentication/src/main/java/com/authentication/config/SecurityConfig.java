@@ -15,11 +15,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)  // disable CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // permit registration endpoint
+                        .requestMatchers("/**").permitAll()  // permit registration endpoint
                         .anyRequest().authenticated()                  // protect all other endpoints
                 )
-                .httpBasic(Customizer.withDefaults());  // or other authentication method you want
-
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
     }
 }

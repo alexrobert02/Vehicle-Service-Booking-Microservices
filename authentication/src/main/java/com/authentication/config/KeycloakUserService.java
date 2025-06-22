@@ -1,6 +1,5 @@
 package com.authentication.config;
 
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -20,6 +19,23 @@ public class KeycloakUserService {
 
     public KeycloakUserService(ClientRegistrationRepository repo) {
         this.keycloakRegistration = repo.findByRegistrationId("spring-with-test-scope");
+    }
+
+    public Map login(LoginRequest request) {
+        String tokenUri = "http://localhost:8080/realms/awbd/protocol/openid-connect/token";
+
+        return webClient.post()
+                .uri(tokenUri)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters
+                        .fromFormData("grant_type", "password")
+                        .with("client_id", keycloakRegistration.getClientId())
+                        .with("client_secret", keycloakRegistration.getClientSecret())
+                        .with("username", request.getUsername())
+                        .with("password", request.getPassword()))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
     }
 
     public void registerUser(RegisterRequest request) {
