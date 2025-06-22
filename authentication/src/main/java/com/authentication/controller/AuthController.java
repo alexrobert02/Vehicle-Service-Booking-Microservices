@@ -1,5 +1,8 @@
-package com.authentication.config;
+package com.authentication.controller;
 
+import com.authentication.service.KeycloakUserService;
+import com.authentication.dto.LoginRequest;
+import com.authentication.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

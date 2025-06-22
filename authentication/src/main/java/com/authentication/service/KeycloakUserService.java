@@ -1,5 +1,7 @@
-package com.authentication.config;
+package com.authentication.service;
 
+import com.authentication.dto.LoginRequest;
+import com.authentication.dto.RegisterRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;

@@ -1,4 +1,4 @@
-package com.authentication.config;
+package com.authentication.dto;
 
 public enum Role {
     CLIENT,
