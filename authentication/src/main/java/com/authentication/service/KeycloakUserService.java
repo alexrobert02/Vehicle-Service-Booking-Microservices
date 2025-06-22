@@ -113,5 +113,17 @@ public class KeycloakUserService {
                 .bodyToMono(Map.class)
                 .map(resp -> (String) resp.get("access_token"));
     }
+
+    public List<Map> getUsersByRole(String role) {
+        String token = getAccessToken().block();
+
+        return webClient.get()
+                .uri("http://localhost:8080/admin/realms/awbd/roles/{role}/users", role.toLowerCase())
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToFlux(Map.class)
+                .collectList()
+                .block();
+    }
 }
 

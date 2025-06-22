@@ -33,9 +33,10 @@ public class GatewayApplication {
                                 })
                         )
                         .uri("lb://FIRST-SERVICE"))
-                .route("authentication_route", r -> r
+                .route("authentication_auth_route", r -> r
                         .path("/awbd/auth/**")
-                        .filters(f -> f.rewritePath("/awbd/auth(?<segment>/?.*)", "/auth${segment}")
+                        .filters(f -> f
+                                .rewritePath("/awbd/auth(?<segment>/?.*)", "/auth${segment}")
                                 .filter((exchange, chain) -> {
                                     long start = System.currentTimeMillis();
                                     return chain.filter(exchange).then(
@@ -46,7 +47,24 @@ public class GatewayApplication {
                                     );
                                 })
                         )
-                        .uri("lb://AUTHENTICATION"))
+                        .uri("lb://AUTHENTICATION")
+                )
+                .route("authentication_user_route", r -> r
+                        .path("/awbd/user/**")
+                        .filters(f -> f
+                                .rewritePath("/awbd/user(?<segment>/?.*)", "/user${segment}")
+                                .filter((exchange, chain) -> {
+                                    long start = System.currentTimeMillis();
+                                    return chain.filter(exchange).then(
+                                            Mono.fromRunnable(() -> {
+                                                long duration = System.currentTimeMillis() - start;
+                                                exchange.getResponse().getHeaders().add("X-Response-Time", duration + "ms");
+                                            })
+                                    );
+                                })
+                        )
+                        .uri("lb://AUTHENTICATION")
+                )
                 .route("vehicle_route", r -> r
                         .path("/awbd/vehicle/**")
                         .filters(f -> f.rewritePath("/awbd/vehicle(?<segment>/?.*)", "/vehicle${segment}")
@@ -61,6 +79,20 @@ public class GatewayApplication {
                                 })
                         )
                         .uri("lb://VEHICLE"))
+                .route("appointment_route", r -> r
+                        .path("/awbd/appointment/**")
+                        .filters(f -> f.rewritePath("/awbd/appointment(?<segment>/?.*)", "/appointment${segment}")
+                                .filter((exchange, chain) -> {
+                                    long start = System.currentTimeMillis();
+                                    return chain.filter(exchange).then(
+                                            Mono.fromRunnable(() -> {
+                                                long duration = System.currentTimeMillis() - start;
+                                                exchange.getResponse().getHeaders().add("X-Response-Time", duration + "ms");
+                                            })
+                                    );
+                                })
+                        )
+                        .uri("lb://APPOINTMENT"))
                 .route("discount_route", r -> r
                         .path("/awbd/discount/**")
                         .filters(f -> f.rewritePath("/awbd/discount/(?<segment>.*)", "/${segment}")
