@@ -1,10 +1,13 @@
 package com.appointment.controller;
 
 import com.appointment.dto.AppointmentDto;
-import com.appointment.entity.Appointment;
 import com.appointment.service.AppointmentService;
+import com.appointment.service.VehicleServiceProxy;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+
+    private final VehicleServiceProxy vehicleServiceProxy;
+
+    private static final Logger logger = LoggerFactory.getLogger(AppointmentController.class);
 
     @GetMapping(value= "/list")
     public CollectionModel<AppointmentDto> findAll() {
@@ -60,7 +67,20 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
+    @CircuitBreaker(name="vehicleById", fallbackMethod = "getAppointmentFallback")
     public AppointmentDto getAppointment(@PathVariable Long id) {
-        return appointmentService.findById(id);
+        AppointmentDto appointmentDto = appointmentService.findById(id);
+
+        vehicleServiceProxy.getVehicleById(appointmentDto.getVehicleId())
+                .doOnNext(vehicleDto -> logger.info(String.valueOf(vehicleDto.getId())))
+                .map(vehicleDto -> {
+                    appointmentDto.setVehicleDto(vehicleDto);
+                    return appointmentDto;
+                }).block();
+        return appointmentDto;
+    }
+
+    AppointmentDto getAppointmentFallback(Long subscriptionId, Throwable throwable) {
+        return appointmentService.findById(subscriptionId);
     }
 }

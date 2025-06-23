@@ -35,7 +35,6 @@ public class AppointmentService {
     public AppointmentDto save(AppointmentDto appointmentDto) {
         String clientId = SecurityUtil.getUserId();
         appointmentDto.setClientId(clientId);
-        //System.out.println("appointmentDto: " + appointmentDto.getClientId() + appointmentDto.getDateTime() + appointmentDto.getMechanicId() + appointmentDto.getVehicleId() + appointmentDto.getServiceTypeIds());
         Appointment appointment = appointmentMapper.toAppointment(appointmentDto);
         Appointment savedAppointment = appointmentRepository.save(appointment);
         return appointmentMapper.toAppointmentDto(savedAppointment);

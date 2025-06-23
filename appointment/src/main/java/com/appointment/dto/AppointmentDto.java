@@ -30,6 +30,8 @@ public class AppointmentDto extends RepresentationModel<AppointmentDto> {
     @NotNull(message = "Vehicle ID is required")
     private Long vehicleId;
 
+    private VehicleDto vehicleDto;
+
     @NotEmpty(message = "At least one service type ID is required")
     private List<Long> serviceTypeIds;
 }
