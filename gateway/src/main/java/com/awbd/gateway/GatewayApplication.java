@@ -79,6 +79,20 @@ public class GatewayApplication {
                                 })
                         )
                         .uri("lb://VEHICLE"))
+                .route("service-type_route", r -> r
+                        .path("/awbd/service-type/**")
+                        .filters(f -> f.rewritePath("/awbd/service-type(?<segment>/?.*)", "/service-type${segment}")
+                                .filter((exchange, chain) -> {
+                                    long start = System.currentTimeMillis();
+                                    return chain.filter(exchange).then(
+                                            Mono.fromRunnable(() -> {
+                                                long duration = System.currentTimeMillis() - start;
+                                                exchange.getResponse().getHeaders().add("X-Response-Time", duration + "ms");
+                                            })
+                                    );
+                                })
+                        )
+                        .uri("lb://SERVICE-TYPE"))
                 .route("appointment_route", r -> r
                         .path("/awbd/appointment/**")
                         .filters(f -> f.rewritePath("/awbd/appointment(?<segment>/?.*)", "/appointment${segment}")
