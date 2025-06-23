@@ -1,7 +1,10 @@
 package com.appointment.controller;
 
 import com.appointment.dto.AppointmentDto;
+import com.appointment.dto.ServiceTypeDto;
+import com.appointment.dto.VehicleDto;
 import com.appointment.service.AppointmentService;
+import com.appointment.service.ServiceTypeServiceProxy;
 import com.appointment.service.VehicleServiceProxy;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
@@ -15,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -28,6 +33,8 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     private final VehicleServiceProxy vehicleServiceProxy;
+
+    private final ServiceTypeServiceProxy serviceTypeServiceProxy;
 
     private static final Logger logger = LoggerFactory.getLogger(AppointmentController.class);
 
@@ -67,20 +74,42 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    @CircuitBreaker(name="vehicleById", fallbackMethod = "getAppointmentFallback")
     public AppointmentDto getAppointment(@PathVariable Long id) {
         AppointmentDto appointmentDto = appointmentService.findById(id);
 
-        vehicleServiceProxy.getVehicleById(appointmentDto.getVehicleId())
-                .doOnNext(vehicleDto -> logger.info(String.valueOf(vehicleDto.getId())))
-                .map(vehicleDto -> {
-                    appointmentDto.setVehicleDto(vehicleDto);
-                    return appointmentDto;
-                }).block();
+        appointmentDto.setVehicleDto(getVehicleDto(appointmentDto.getVehicleId()));
+        appointmentDto.setServiceTypeDtos(getServiceTypeDtos(appointmentDto.getServiceTypeIds()));
+
         return appointmentDto;
     }
 
-    AppointmentDto getAppointmentFallback(Long subscriptionId, Throwable throwable) {
-        return appointmentService.findById(subscriptionId);
+    @CircuitBreaker(name = "vehicleById", fallbackMethod = "vehicleFallback")
+    public VehicleDto getVehicleDto(Long vehicleId) {
+        return vehicleServiceProxy.getVehicleById(vehicleId).block();
+    }
+
+    public VehicleDto vehicleFallback(Long vehicleId, Throwable throwable) {
+        logger.warn("Fallback for vehicle ID: {}", vehicleId, throwable);
+        return null;
+    }
+
+    @CircuitBreaker(name = "serviceTypes", fallbackMethod = "serviceTypesFallback")
+    public List<ServiceTypeDto> getServiceTypeDtos(List<Long> serviceTypeIds) {
+        return serviceTypeIds.stream()
+                .map(id -> {
+                    try {
+                        return serviceTypeServiceProxy.getServiceTypeById(id).block();
+                    } catch (Exception e) {
+                        logger.warn("Fallback for service type ID: {}", id, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public List<ServiceTypeDto> serviceTypesFallback(List<Long> serviceTypeIds, Throwable throwable) {
+        logger.warn("Fallback for service type list: " + serviceTypeIds, throwable);
+        return Collections.emptyList();
     }
 }

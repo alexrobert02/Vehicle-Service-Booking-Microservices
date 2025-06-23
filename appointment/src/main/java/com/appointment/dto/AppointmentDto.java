@@ -34,4 +34,6 @@ public class AppointmentDto extends RepresentationModel<AppointmentDto> {
 
     @NotEmpty(message = "At least one service type ID is required")
     private List<Long> serviceTypeIds;
+
+    private List<ServiceTypeDto> serviceTypeDtos;
 }
