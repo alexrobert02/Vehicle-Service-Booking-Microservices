@@ -1,0 +1,43 @@
+eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+server:
+  port: 8084
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/awbd
+        registration:
+          spring-with-test-scope:
+            authorization-grant-type: authorization_code
+            client-id: spring-demo
+            client-secret: 48Rr7HruC57iZ5NsZRzt0rhqpHPdFPA5
+            provider: keycloak
+            scope: openid
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/awbd/protocol/openid-connect/certs
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      vehicleById:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+      serviceTypes:
+        slidingWindowSize: 10
+        failureRateThreshold: 40
