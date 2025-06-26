@@ -6,6 +6,12 @@ eureka:
 #    service-url:
 #      defaultZone: http://localhost:8761/eureka
 
+jwt:
+  auth:
+    converter:
+      resource-id: spring-demo
+      principle-attribute: preferred_username
+
 management:
   tracing:
     sampling:

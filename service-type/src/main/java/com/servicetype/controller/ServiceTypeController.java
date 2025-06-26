@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -49,6 +50,8 @@ public class ServiceTypeController {
         return ResponseEntity.ok(serviceTypeDto);
     }
 
+
+    @PreAuthorize("hasRole('user_mechanic')")
     @PostMapping
     public ResponseEntity<ServiceTypeDto> saveServiceType(@Valid @RequestBody ServiceTypeDto serviceTypeDto) {
         ServiceTypeDto saved = serviceTypeService.save(serviceTypeDto);

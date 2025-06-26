@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -54,6 +55,7 @@ public class VehicleController {
         return vehicleService.findById(id);
     }
 
+    @PreAuthorize("hasRole('user_client')")
     @PostMapping
     public ResponseEntity<VehicleDto> saveVehicle(@Valid @RequestBody VehicleDto vehicleDto) {
         VehicleDto saved = vehicleService.save(vehicleDto);
