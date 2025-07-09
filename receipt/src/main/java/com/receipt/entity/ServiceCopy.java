@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// Clasa ServiceCopy este stocată direct în tabelul 'receipt_services'
-// ca parte a entității Receipt, datorită adnotării @Embeddable.
 @Embeddable
 @Getter
 @Setter

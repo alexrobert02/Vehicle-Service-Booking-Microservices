@@ -1,4 +1,4 @@
-package com.appointment.config;
+package com.receipt.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -16,4 +16,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .mediaType("xml", MediaType.APPLICATION_XML);
     }
 }
+
 

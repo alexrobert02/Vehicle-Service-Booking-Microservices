@@ -1,6 +1,6 @@
-package com.appointment.service;
+package com.receipt.service;
 
-import com.appointment.dto.ServiceTypeDto;
+import com.receipt.dto.ServiceTypeDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServletBearerExchangeFilterFunction;
 import org.springframework.stereotype.Service;

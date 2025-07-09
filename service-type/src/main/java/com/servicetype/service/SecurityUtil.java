@@ -25,7 +25,6 @@ public class SecurityUtil {
             }
         }
 
-        // Fallback for other principal types if needed, or if sub is not present
         return null;
     }
 }

@@ -21,9 +21,6 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/webjars/**"
                         ).permitAll()
-                        // Doar alte servicii (cum ar fi 'appointment-service') ar trebui să poată crea chitanțe.
-                        // Putem securiza acest endpoint mai granular folosind roluri de tip 'SERVICE_ROLE'.
-                        .requestMatchers(HttpMethod.POST, "/api/receipts").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

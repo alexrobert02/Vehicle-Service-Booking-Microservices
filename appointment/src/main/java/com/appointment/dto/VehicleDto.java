@@ -1,7 +1,6 @@
 package com.appointment.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -28,6 +27,6 @@ public class VehicleDto extends RepresentationModel<VehicleDto> {
     @Pattern(regexp = "^[A-Z0-9-]{5,10}$", message = "Plate number must be 5-10 characters and contain only uppercase letters, digits, or hyphens")
     private String plateNumber;
 
-    private String clientId; // Or Long, depending on your client service ID type
+    private String clientId;
 }
 

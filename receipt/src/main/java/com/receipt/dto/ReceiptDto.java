@@ -30,11 +30,9 @@ public class ReceiptDto extends RepresentationModel<ReceiptDto> {
 
     @NotNull(message = "Client ID is required")
     private String clientId;
-//    private String clientUsername;
 
     @NotNull(message = "Mechanic ID is required")
     private String mechanicId;
-//    private String mechanicUsername;
 
     @NotNull(message = "Appointment ID is required")
     private Long appointmentId;

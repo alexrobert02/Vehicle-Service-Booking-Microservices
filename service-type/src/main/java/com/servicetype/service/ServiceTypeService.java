@@ -35,11 +35,9 @@ public class ServiceTypeService {
     @Transactional
     public ServiceTypeDto save(ServiceTypeDto serviceTypeDto) {
         if (serviceTypeDto.getId() == null) {
-            // Creare nou serviciu -> setăm mechanicId din utilizatorul curent
             String mechanicId = SecurityUtil.getUserId();
             serviceTypeDto.setMechanicId(mechanicId);
         } else {
-            // Update -> păstrăm mechanicId-ul existent din baza de date
             ServiceType existing = serviceTypeRepository.findById(serviceTypeDto.getId())
                     .orElseThrow(() -> new ServiceTypeNotFoundException("ServiceType not found with id: " + serviceTypeDto.getId()));
             serviceTypeDto.setMechanicId(existing.getMechanicId());
@@ -56,10 +54,6 @@ public class ServiceTypeService {
         if (!serviceTypeRepository.existsById(id)) {
             throw new ServiceTypeNotFoundException("ServiceType not found with id: " + id);
         }
-        // In a microservice architecture, complex cascading deletes or checks
-        // against other services (like appointments) should be handled carefully.
-        // This might involve event-driven communication or direct API calls.
-        // For now, we'll keep it simple and just delete the service type.
         serviceTypeRepository.deleteById(id);
     }
 

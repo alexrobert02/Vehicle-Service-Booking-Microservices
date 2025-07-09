@@ -1,6 +1,6 @@
-package com.appointment.service;
+package com.receipt.service;
 
-import com.appointment.dto.ServiceTypeDto;
+import com.receipt.dto.VehicleDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServletBearerExchangeFilterFunction;
 import org.springframework.stereotype.Service;
@@ -8,22 +8,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class ServiceTypeServiceProxy {
+public class VehicleServiceProxy {
 
     private final WebClient webClient;
 
-    public ServiceTypeServiceProxy(WebClient.Builder builder) {
+    public VehicleServiceProxy(WebClient.Builder builder) {
         this.webClient = builder
                 .filter(new ServletBearerExchangeFilterFunction()) // enables token propagation
                 .build();
     }
 
-    public Mono<ServiceTypeDto> getServiceTypeById(Long id) {
+    public Mono<VehicleDto> getVehicleById(Long id) {
         return webClient
                 .get()
-                .uri("lb://SERVICE-TYPE/service-type/{id}", id)
+                .uri("lb://VEHICLE/vehicle/{id}", id)
                 .header(HttpHeaders.AUTHORIZATION)
                 .retrieve()
-                .bodyToMono(ServiceTypeDto.class);
+                .bodyToMono(VehicleDto.class);
     }
 }

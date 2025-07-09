@@ -1,6 +1,7 @@
-package com.appointment.service;
+package com.receipt.service;
 
-import com.appointment.dto.ServiceTypeDto;
+import com.receipt.dto.AppointmentDto;
+import com.receipt.dto.ServiceTypeDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServletBearerExchangeFilterFunction;
 import org.springframework.stereotype.Service;
@@ -8,22 +9,23 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class ServiceTypeServiceProxy {
+public class AppointmentServiceProxy {
 
     private final WebClient webClient;
 
-    public ServiceTypeServiceProxy(WebClient.Builder builder) {
+    public AppointmentServiceProxy(WebClient.Builder builder) {
         this.webClient = builder
                 .filter(new ServletBearerExchangeFilterFunction()) // enables token propagation
                 .build();
     }
 
-    public Mono<ServiceTypeDto> getServiceTypeById(Long id) {
+    public Mono<AppointmentDto> getAppointmentById(Long id) {
         return webClient
                 .get()
-                .uri("lb://SERVICE-TYPE/service-type/{id}", id)
+                .uri("lb://APPOINTMENT/appointment/{id}", id)
                 .header(HttpHeaders.AUTHORIZATION)
                 .retrieve()
-                .bodyToMono(ServiceTypeDto.class);
+                .bodyToMono(AppointmentDto.class);
     }
 }
+

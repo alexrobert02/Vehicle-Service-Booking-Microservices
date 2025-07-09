@@ -19,20 +19,6 @@ public class GatewayApplication {
     @Bean
     public RouteLocator myRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("subscription_route", r -> r
-                        .path("/awbd/subscription/**")
-                        .filters(f -> f.rewritePath("/awbd/subscription/(?<segment>.*)", "/${segment}")
-                                .filter((exchange, chain) -> {
-                                    long start = System.currentTimeMillis();
-                                    return chain.filter(exchange).then(
-                                            Mono.fromRunnable(() -> {
-                                                long duration = System.currentTimeMillis() - start;
-                                                exchange.getResponse().getHeaders().add("X-Response-Time", duration + "ms");
-                                            })
-                                    );
-                                })
-                        )
-                        .uri("lb://FIRST-SERVICE"))
                 .route("authentication_auth_route", r -> r
                         .path("/awbd/auth/**")
                         .filters(f -> f
@@ -107,9 +93,9 @@ public class GatewayApplication {
                                 })
                         )
                         .uri("lb://APPOINTMENT"))
-                .route("discount_route", r -> r
-                        .path("/awbd/discount/**")
-                        .filters(f -> f.rewritePath("/awbd/discount/(?<segment>.*)", "/${segment}")
+                .route("receipt_route", r -> r
+                        .path("/awbd/receipt/**")
+                        .filters(f -> f.rewritePath("/awbd/receipt(?<segment>/?.*)", "/receipt${segment}")
                                 .filter((exchange, chain) -> {
                                     long start = System.currentTimeMillis();
                                     return chain.filter(exchange).then(
@@ -120,8 +106,7 @@ public class GatewayApplication {
                                     );
                                 })
                         )
-                        .uri("lb://DISCOUNT"))
-
+                        .uri("lb://RECEIPT"))
                 .build();
     }
 }

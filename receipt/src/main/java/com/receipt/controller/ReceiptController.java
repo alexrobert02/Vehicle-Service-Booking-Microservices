@@ -2,7 +2,6 @@ package com.receipt.controller;
 
 import com.receipt.dto.ReceiptDto;
 import com.receipt.service.ReceiptService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
@@ -17,17 +16,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/receipts")
+@RequestMapping("/receipt")
 @RequiredArgsConstructor
 public class ReceiptController {
 
     private final ReceiptService receiptService;
 
-    // Endpoint principal pentru crearea unei chitanțe.
-    // Acesta va fi apelat de 'appointment-service' după finalizarea unei programări.
-    @PostMapping
-    public ResponseEntity<ReceiptDto> createReceipt(@Valid @RequestBody ReceiptDto receiptDto) {
-        ReceiptDto savedReceipt = receiptService.createReceipt(receiptDto);
+    @PostMapping("/{appointmentId}")
+    public ResponseEntity<ReceiptDto> createReceipt(@PathVariable Long appointmentId) {
+        ReceiptDto savedReceipt = receiptService.createReceipt(appointmentId);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(savedReceipt.getId()).toUri();
 

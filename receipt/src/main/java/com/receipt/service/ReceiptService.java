@@ -1,16 +1,25 @@
 package com.receipt.service;
 
+import com.receipt.dto.AppointmentDto;
 import com.receipt.dto.ReceiptDto;
+import com.receipt.dto.ServiceTypeDto;
+import com.receipt.dto.VehicleDto;
 import com.receipt.entity.Receipt;
+import com.receipt.entity.ServiceCopy;
 import com.receipt.exception.ReceiptNotFoundException;
 import com.receipt.mapper.ReceiptMapper;
 import com.receipt.repository.ReceiptRepository;
 import lombok.RequiredArgsConstructor;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,16 +27,82 @@ import java.util.stream.Collectors;
 public class ReceiptService {
 
     private final ReceiptRepository receiptRepository;
+
     private final ReceiptMapper receiptMapper;
 
-    @Transactional
-    public ReceiptDto createReceipt(ReceiptDto receiptDto) {
-        // Setează data emiterii la momentul creării
-        receiptDto.setIssueDate(LocalDate.now());
+    private final AppointmentServiceProxy appointmentServiceProxy;
 
-        Receipt receipt = receiptMapper.toReceipt(receiptDto);
-        Receipt savedReceipt = receiptRepository.save(receipt);
-        return receiptMapper.toReceiptDto(savedReceipt);
+    private final VehicleServiceProxy vehicleServiceProxy;
+
+    private final ServiceTypeServiceProxy serviceTypeServiceProxy;
+
+    private static final Logger logger = LoggerFactory.getLogger(ReceiptService.class);
+
+    @Transactional
+    public ReceiptDto createReceipt(Long appointmentId) {
+        AppointmentDto appointment = getAppointmentDto(appointmentId);
+        VehicleDto vehicle = getVehicleDto(appointment.getVehicleId());
+        List<ServiceTypeDto> services = getServiceTypeDtos(appointment.getServiceTypeIds());
+
+        double totalAmount = services.stream().mapToDouble(ServiceTypeDto::getPrice).sum();
+
+        List<ServiceCopy> serviceCopies = services.stream()
+                .map(st -> new ServiceCopy(st.getName(), st.getPrice()))
+                .collect(Collectors.toList());
+
+        ReceiptDto receiptDto = ReceiptDto.builder()
+                .appointmentId(appointment.getId())
+                .clientId(appointment.getClientId())
+                .mechanicId(appointment.getMechanicId())
+                .vehicle(vehicle.getBrand() + " " + vehicle.getModel() + " - " + vehicle.getPlateNumber())
+                .services(serviceCopies)
+                .totalAmount(totalAmount)
+                .appointmentDateTime(appointment.getDateTime())
+                .issueDate(LocalDate.now())
+                .build();
+
+        Receipt saved = receiptRepository.save(receiptMapper.toReceipt(receiptDto));
+        return receiptMapper.toReceiptDto(saved);
+    }
+
+    @CircuitBreaker(name = "vehicleById", fallbackMethod = "vehicleFallback")
+    public VehicleDto getVehicleDto(Long vehicleId) {
+        return vehicleServiceProxy.getVehicleById(vehicleId).block();
+    }
+
+    public VehicleDto vehicleFallback(Long vehicleId, Throwable throwable) {
+        logger.warn("Fallback for vehicle ID: {}", vehicleId, throwable);
+        return null;
+    }
+
+    @CircuitBreaker(name = "appointmentById", fallbackMethod = "appointmentFallback")
+    public AppointmentDto getAppointmentDto(Long appointmentId) {
+        return appointmentServiceProxy.getAppointmentById(appointmentId).block();
+    }
+
+    public AppointmentDto appointmentFallback(Long appointmentId, Throwable throwable) {
+        logger.warn("Fallback for appointment ID: {}", appointmentId, throwable);
+        return null;
+    }
+
+    @CircuitBreaker(name = "serviceTypes", fallbackMethod = "serviceTypesFallback")
+    public List<ServiceTypeDto> getServiceTypeDtos(List<Long> serviceTypeIds) {
+        return serviceTypeIds.stream()
+                .map(id -> {
+                    try {
+                        return serviceTypeServiceProxy.getServiceTypeById(id).block();
+                    } catch (Exception e) {
+                        logger.warn("Fallback for service type ID: {}", id, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public List<ServiceTypeDto> serviceTypesFallback(List<Long> serviceTypeIds, Throwable throwable) {
+        logger.warn("Fallback for service type list: {}", serviceTypeIds, throwable);
+        return Collections.emptyList();
     }
 
     public ReceiptDto findById(Long id) {
