@@ -1,6 +1,7 @@
 package com.vsbm.appointment.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -24,7 +25,7 @@ public class AppointmentDto extends RepresentationModel<AppointmentDto> {
 
     private String clientId;
 
-    @NotNull(message = "Mechanic ID is required")
+    @NotBlank(message = "Mechanic ID is required")
     private String mechanicId;
 
     @NotNull(message = "Vehicle ID is required")

@@ -1,10 +1,7 @@
 package com.vsbm.receipt.dto;
 
 import com.vsbm.receipt.entity.ServiceCopy;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -19,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReceiptDto extends RepresentationModel<ReceiptDto> {
     private Long id;
+
     private LocalDate issueDate;
 
     @NotNull(message = "Total amount is required")
@@ -28,14 +26,15 @@ public class ReceiptDto extends RepresentationModel<ReceiptDto> {
     @NotBlank(message = "Vehicle info is required")
     private String vehicle;
 
-    @NotNull(message = "Client ID is required")
+    @NotBlank(message = "Client ID is required")
     private String clientId;
 
-    @NotNull(message = "Mechanic ID is required")
+    @NotBlank(message = "Mechanic ID is required")
     private String mechanicId;
 
     @NotNull(message = "Appointment ID is required")
     private Long appointmentId;
+
     private LocalDateTime appointmentDateTime;
 
     @NotEmpty(message = "Services list cannot be empty")

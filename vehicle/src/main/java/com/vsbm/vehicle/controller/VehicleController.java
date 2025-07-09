@@ -88,9 +88,9 @@ public class VehicleController {
         }
     }
 
-    @GetMapping("/client/{username}")
-    public List<VehicleDto> getVehiclesByClientUsername(@PathVariable String username) {
-        return vehicleService.findByClientUsername(username);
+    @GetMapping("/client/{clientId}")
+    public List<VehicleDto> getVehiclesByClientId(@PathVariable String clientId) {
+        return vehicleService.findByClientId(clientId);
     }
 }
 

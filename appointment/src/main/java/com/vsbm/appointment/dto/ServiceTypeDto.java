@@ -24,5 +24,6 @@ public class ServiceTypeDto extends RepresentationModel<ServiceTypeDto> {
     @DecimalMin(value = "0.01", message = "Price must be positive")
     private Double price;
 
+    @NotBlank(message = "Mechanic ID is required")
     private String mechanicId;
 }

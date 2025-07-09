@@ -51,8 +51,7 @@ public class VehicleService {
         return true;
     }
 
-    public List<VehicleDto> findByClientUsername(String username) {
-        String clientId = SecurityUtil.getUserId();
+    public List<VehicleDto> findByClientId(String clientId) {
         return vehicleRepository.findByClientId(clientId)
                 .stream()
                 .map(vehicleMapper::toVehicleDto)

@@ -1,6 +1,5 @@
 package com.vsbm.appointment.controller;
 
-import com.appointment.dto.*;
 import com.vsbm.appointment.service.AppointmentService;
 import com.vsbm.appointment.service.ServiceTypeServiceProxy;
 import com.vsbm.appointment.service.VehicleServiceProxy;

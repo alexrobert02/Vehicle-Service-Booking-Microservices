@@ -39,12 +39,4 @@ public class AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
         return appointmentMapper.toAppointmentDto(savedAppointment);
     }
-
-    @Transactional
-    public void markAsReceiptGenerated(Long appointmentId, Long receiptId) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new AppointmentNotFound("Appointment not found with id: " + appointmentId));
-        appointment.setReceiptId(receiptId);
-        appointmentRepository.save(appointment);
-    }
 }

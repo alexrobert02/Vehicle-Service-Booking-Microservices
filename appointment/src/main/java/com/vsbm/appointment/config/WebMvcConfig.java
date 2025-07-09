@@ -16,4 +16,3 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .mediaType("xml", MediaType.APPLICATION_XML);
     }
 }
-
