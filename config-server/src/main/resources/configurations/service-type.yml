@@ -26,7 +26,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/awbd
+            issuer-uri: http://localhost:8080/realms/vsbm
         registration:
           spring-with-test-scope:
             authorization-grant-type: authorization_code
@@ -36,4 +36,4 @@ spring:
             scope: openid
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8080/realms/awbd/protocol/openid-connect/certs
+          jwk-set-uri: http://localhost:8080/realms/vsbm/protocol/openid-connect/certs
